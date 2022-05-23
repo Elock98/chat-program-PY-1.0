@@ -1,17 +1,25 @@
-ERROR 2022-05-22 20:41:08,323 [WinError 10061] No connection could be made because the target machine actively refused it
-ERROR 2022-05-22 20:41:10,358 [WinError 10061] No connection could be made because the target machine actively refused it
-ERROR 2022-05-22 20:41:12,386 [WinError 10061] No connection could be made because the target machine actively refused it
-ERROR 2022-05-22 20:41:14,432 [WinError 10061] No connection could be made because the target machine actively refused it
-ERROR 2022-05-22 20:41:16,469 [WinError 10061] No connection could be made because the target machine actively refused it
-ERROR 2022-05-22 20:41:18,506 [WinError 10061] No connection could be made because the target machine actively refused it
-ERROR 2022-05-22 20:41:20,547 [WinError 10061] No connection could be made because the target machine actively refused it
-ERROR 2022-05-22 20:41:22,586 [WinError 10061] No connection could be made because the target machine actively refused it
-ERROR 2022-05-22 20:41:24,626 [WinError 10061] No connection could be made because the target machine actively refused it
-ERROR 2022-05-22 20:41:26,656 [WinError 10061] No connection could be made because the target machine actively refused it
-ERROR 2022-05-22 20:41:28,693 [WinError 10061] No connection could be made because the target machine actively refused it
-ERROR 2022-05-22 20:41:30,744 [WinError 10061] No connection could be made because the target machine actively refused it
-ERROR 2022-05-22 20:41:32,787 [WinError 10061] No connection could be made because the target machine actively refused it
-ERROR 2022-05-22 20:41:34,832 [WinError 10061] No connection could be made because the target machine actively refused it
-ERROR 2022-05-22 20:41:36,885 [WinError 10061] No connection could be made because the target machine actively refused it
-ERROR 2022-05-22 20:41:36,885 Connection attempt timed out
-ERROR 2022-05-22 20:41:36,901 'Server' object has no attribute 'connection'
+ERROR 2022-05-23 15:49:22,650 Exception during client connection: [WinError 10061] No connection could be made because the target machine actively refused it!
+ERROR 2022-05-23 15:52:01,297 Exception during server connection: module 'socket' has no attribute 'settimeout'!
+ERROR 2022-05-23 15:52:01,297 Exception during client connection: module 'socket' has no attribute 'settimeout'!
+ERROR 2022-05-23 15:52:55,305 Exception during client connection: [WinError 10061] No connection could be made because the target machine actively refused it!
+ERROR 2022-05-23 15:54:20,777 Exception during client connection: [WinError 10061] No connection could be made because the target machine actively refused it!
+ERROR 2022-05-23 15:55:08,104 Exception during client connection: [WinError 10061] No connection could be made because the target machine actively refused it!
+ERROR 2022-05-23 15:56:09,555 Exception during client connection: [WinError 10061] No connection could be made because the target machine actively refused it!
+ERROR 2022-05-23 15:56:49,800 Exception during client connection: [WinError 10061] No connection could be made because the target machine actively refused it!
+ERROR 2022-05-23 15:57:07,799 Exception during client close: timed out!
+ERROR 2022-05-23 15:57:07,802 Exception during server closing: 'Server' object has no attribute 'connection'!
+ERROR 2022-05-23 15:57:33,465 Exception during client connection: [WinError 10061] No connection could be made because the target machine actively refused it!
+ERROR 2022-05-23 15:57:51,447 Exception during client close: timed out!
+ERROR 2022-05-23 15:57:51,449 Exception during server closing: 'Server' object has no attribute 'connection'!
+ERROR 2022-05-23 15:59:39,926 Exception during server connection: [WinError 10048] Only one usage of each socket address (protocol/network address/port) is normally permitted!
+ERROR 2022-05-23 16:00:36,716 Exception during get_msg: timed out!
+ERROR 2022-05-23 16:01:12,474 Exception during server connection: [WinError 10048] Only one usage of each socket address (protocol/network address/port) is normally permitted!
+ERROR 2022-05-23 16:01:14,494 Exception during server closing: 'Server' object has no attribute 'connection'!
+ERROR 2022-05-23 16:01:33,131 Exception during server connection: [WinError 10048] Only one usage of each socket address (protocol/network address/port) is normally permitted!
+ERROR 2022-05-23 16:01:33,144 Exception during server closing: 'Server' object has no attribute 'connection'!
+ERROR 2022-05-23 16:01:34,651 Exception during server connection: [WinError 10048] Only one usage of each socket address (protocol/network address/port) is normally permitted!
+ERROR 2022-05-23 16:01:34,663 Exception during server closing: 'Server' object has no attribute 'connection'!
+ERROR 2022-05-23 16:01:45,601 Exception during server connection: [WinError 10048] Only one usage of each socket address (protocol/network address/port) is normally permitted!
+ERROR 2022-05-23 16:01:47,622 Exception during server closing: 'Server' object has no attribute 'connection'!
+ERROR 2022-05-23 16:01:51,624 Exception in chatwindow run: not enough values to unpack (expected 2, got 0)!
+ERROR 2022-05-23 16:01:58,574 Exception in chatwindow run: not enough values to unpack (expected 2, got 0)!

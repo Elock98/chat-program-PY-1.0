@@ -1,4 +1,4 @@
-from threading import Thread
+from threading import Thread, Event
 import PySimpleGUI as sg
 import time
 from logger import Logger
@@ -46,21 +46,23 @@ class ChattWindow:
 
         return sg.Window("Chat", layout, size=(800, 650), finalize=True)
 
-    def connect(self, s_port: int, c_port: int) -> None:
+    def connect(self, ip: str, port: str) -> None:
 
         """
             Creates a server and client object and runs their open_connection
             methods.
         """
 
-        self.server = Server(self.window, self.logger, s_port)
+        self.server = Server(self.window, self.logger, ip, port)
         
-        self.server_thread = Thread(target=self.server.open_connection)
+        self.server_thread = Thread(target=self.server.open_connection, 
+                                    args=(self.server_connected_done,
+                                            self.server_connected_err))
         self.server_thread.start()
         
-        print("Pre temp short delay between server start and client start")
-        time.sleep(0.5)
-        print("Post temp short delay between server start and client start")
+        # print("Pre temp short delay between server start and client start")
+        # time.sleep(0.5)
+        # print("Post temp short delay between server start and client start")
 
         """
             Note To Self:
@@ -70,8 +72,13 @@ class ChattWindow:
             None if no result yet.
         """
 
-        self.client = Client(self.window, self.logger, c_port)
-        self.client.open_connection(time.perf_counter())
+        self.client = Client(self.window, self.logger, ip, port)
+        self.client_thread = Thread(target=self.client.open_connection, 
+                                    args=(self.client_connected_done,
+                                            self.client_connected_err))
+        self.client_thread.start()
+
+        #self.client.open_connection(time.perf_counter())
         
     def run(self) -> None:
 
@@ -79,42 +86,86 @@ class ChattWindow:
             Main event loop for chat window.
         """
 
-        active = False
+        self.client_connected_done = Event()
+        self.client_connected_err = Event()
+
+        self.server_connected_done = Event()
+        self.server_connected_err = Event()
+
+        connecting = False
+        connected = False
+
         while True:
             try:
                 # If not connected only run loop on event
-                if not active:
+                if not connecting and not connected:
                     event, values = self.window.read()
 
                 # Else continuously run the loop
                 else:
                     event, values = self.window.read(10)
 
-
                 # Break loop when window is closed
                 if event == sg.WIN_CLOSED:
                     break
 
-                if event == 'Connect' and active == False:
-                    self.window['MESSAGES'].update("Connected")
+                # While trying to connect
+                if connecting:
+                    if (self.client_connected_err.is_set()
+                        or self.server_connected_err.is_set()):
 
-                    active = True
+                        self.client.close_connection()
+                        self.server.close_connection()
 
-                    s_port, c_port = values['MY_MESSAGE'].split() # Temp
+                        connected = False
+                        connecting = False
 
-                    self.connect(int(s_port), int(c_port))
+                        self.client_connected_done.clear()
+                        self.client_connected_err.clear()
+
+                        self.server_connected_done.clear()
+                        self.server_connected_err.clear()
+                        
+                        self.window['MESSAGES'].update("Connection failed!")
+
+                    elif (self.client_connected_done.is_set()
+                            and self.server_connected_done.is_set()):
+                            
+                            connected = True
+                            connecting = False
+
+                            self.client_connected_done.clear()
+                            self.client_connected_err.clear()
+
+                            self.server_connected_done.clear()
+                            self.server_connected_err.clear()
+                            
+                            self.window['MESSAGES'].update("Connected!")
+                    else:
+                        
+                        continue
+
+                # When connected
+                if event == 'Connect' and not connected:
+                    self.window['MESSAGES'].update("Connecting...")
+
+                    connecting = True
+
+                    ip, port = values['MY_MESSAGE'].split(":") # Temp
+
+                    self.connect(int(ip), int(port))
 
                     self.window['MY_MESSAGE'].update("")
 
-                if event == 'Disconnect' and active:
+                if event == 'Disconnect' and connected:
                     self.window['MESSAGES'].update("Disconnected")
 
-                    active = False
+                    connected = False
                     
                     self.client.close_connection()
                     self.server.close_connection()
 
-                if event == 'Send' and active:
+                if event == 'Send' and connected:
                     self.window['MESSAGES'].update(values['MESSAGES'] + '\n' 
                                                     + self.time_stamp.get_time()
                                                     + ' ME: ' 
@@ -124,13 +175,13 @@ class ChattWindow:
 
                     self.window['MY_MESSAGE'].update("")
 
-                if active:
+                if connected:
                     resp = self.server.get_msg(values['MESSAGES'])
                     if resp == "Close":
                         
                         self.window['MESSAGES'].update("Disconnected")
                         
-                        active = False
+                        connected = False
                         
                         self.client.close_connection()
                         self.server.close_connection()
