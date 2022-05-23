@@ -1,4 +1,3 @@
-import imp
 from threading import Thread
 import PySimpleGUI as sg
 import time

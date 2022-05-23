@@ -1,4 +1,3 @@
-from distutils.log import Log
 from logger import Logger
 from UI import ChattWindow
 

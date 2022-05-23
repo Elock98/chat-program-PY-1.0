@@ -32,7 +32,7 @@ class Server:
         self.time_stamp = TimeStamp() # Used to output message recieved time
         self.logger = logger    # Used to log errors
         
-    def open_connection(self) -> None: # Se if it can return true if connected and false if not (also look into timout for accept()) [TEMP COMMENT]
+    def open_connection(self) -> None: # Look into timeout for accept()
         
         """
             Sets up a server socket and waits for client to connect.
@@ -78,7 +78,7 @@ class Server:
             msg = self.connection.recv(1024).decode()
             
             if msg == '<Terminating connection>':
-                self.close_connection()
+                #self.close_connection()
                 print(msg)
                 return "Close"
             else:
