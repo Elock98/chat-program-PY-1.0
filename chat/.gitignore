@@ -1,0 +1,5 @@
+# Compiled python files
+.pyc
+
+# VS code settings
+settings.jason
