@@ -6,7 +6,7 @@ from timestamp import TimeStamp
 from contact import NewContactUI, ShowContactsUI, SelectContactUI
 
 
-class ChattWindow:
+class ChatWindow:
 
     def __init__(self, logger: Logger) -> None:
 
@@ -20,6 +20,7 @@ class ChattWindow:
 
         # Setting instance attributes
         self.window = self.make_window()
+        self.window["MY_MESSAGE"].bind("<Return>", "_Enter")
 
         self.time_stamp = TimeStamp()
         self.logger = logger
@@ -167,7 +168,9 @@ class ChattWindow:
                     self.client.close_connection()
                     self.server.close_connection()
 
-                if event == 'Send' and connected and values['MESSAGES'] != "":
+                if ((event == 'Send' or event == "MY_MESSAGE_Enter") 
+                    and connected and values['MESSAGES'] != ""):
+
                     self.window['MESSAGES'].update(values['MESSAGES'] + '\n' 
                                                     + self.time_stamp.get_time()
                                                     + ' ME: ' 

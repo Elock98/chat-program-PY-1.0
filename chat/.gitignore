@@ -1,8 +1,10 @@
 # Compiled python files
 *.pyc
+__pycache__
 
 # VS code settings
 settings.json
+.vscode
 
 # Executables
 *.exe
@@ -10,5 +12,5 @@ settings.json
 backup
 build
 dist
-.vscode
-__pycache__
+
+*.spec

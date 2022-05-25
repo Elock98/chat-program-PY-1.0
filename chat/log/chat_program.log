@@ -13,3 +13,6 @@ ERROR 2022-05-25 18:17:34,383 Exception in chatwindow run: invalid command name 
 ERROR 2022-05-25 18:22:53,469 Exception during client connection: [WinError 10061] No connection could be made because the target machine actively refused it!
 ERROR 2022-05-25 18:23:22,481 Exception during client close: timed out!
 ERROR 2022-05-25 18:23:22,482 Exception during server closing: 'Server' object has no attribute 'connection'!
+ERROR 2022-05-25 20:28:56,948 Exception during client connection: [WinError 10061] No connection could be made because the target machine actively refused it!
+ERROR 2022-05-25 20:28:57,977 Exception during client close: timed out!
+ERROR 2022-05-25 20:28:57,978 Exception during server closing: 'Server' object has no attribute 'connection'!

@@ -1,11 +1,11 @@
 from logger import Logger
-from UI import ChattWindow
+from UI import ChatWindow
 
 
-if __name__ == "__main__":
+def main():
     try:
         logger = Logger() # Create log object
-        ChattWindow(logger).run() # Start program
+        ChatWindow(logger).run() # Start program
         
         
     except Exception as e:
@@ -14,5 +14,9 @@ if __name__ == "__main__":
     finally:
         print("Terminated!")
         input("Enter any key to exit... ")
+
+
+if __name__ == "__main__":
+    main()
 
 #package as exe using: pyinstaller --onefile main.py
