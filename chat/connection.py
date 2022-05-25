@@ -9,7 +9,7 @@ import time
 class Server:
 
     def __init__(self, win: PySimpleGUI.Window, logger: Logger,
-                                        ip: str, s_port: str = "1500") -> None:
+                                        s_port: int = 1500) -> None:
 
         """
             Initializes a server connection object.
@@ -21,17 +21,14 @@ class Server:
         assert isinstance(logger, Logger), (f"The given logger {logger}"
                                             " is not of type Logger!")
 
-        assert isinstance(ip, str), (f"The given server ip {ip}"
-                                        " is not of type str!")
-
-        assert isinstance(s_port, str), (f"The given server port {s_port}"
-                                        " is not of type str!")
+        assert isinstance(s_port, int), (f"The given server port {s_port}"
+                                        " is not of type int!")
 
         # Setting instance arrtibutes
-        self.host = socket.gethostname() # Exchange for host ip later
+        self.host = socket.gethostbyname(socket.gethostname()) # Get device IP.
         self.server_port = s_port
 
-        self.server = (ip, s_port)
+        self.server = (self.host, s_port)
 
         self.window = win
         self.time_stamp = TimeStamp() # Used to output message recieved time
@@ -40,7 +37,8 @@ class Server:
     def open_connection(self, done: Event, err: Event) -> None:
 
         """
-            Sets up a server socket and waits for client to connect.
+            Sets up a server socket and waits for 30 seconds for
+            client to connect. If no connection server times out.
         """
 
         try:
@@ -50,7 +48,6 @@ class Server:
 
             self.server_soc.settimeout(30)
 
-            #self.server_soc.bind((self.host, self.server_port))
             self.server_soc.bind(self.server)
 
             self.server_soc.listen(5)
@@ -59,16 +56,16 @@ class Server:
 
             print ('New connection from', addr )
 
-            done.set()
+            done.set() # Tells the main thread that server got a connection.
 
         except socket.timeout:
             print("Server timed out")
-            err.set()
+            err.set() # Tells main thread that error occured.
 
         except Exception as e:
             print(f"Exception during server connection: {e}!")
             self.logger.log.error(f"Exception during server connection: {e}!")
-            err.set()
+            err.set() # Tells main thread that error occured.
 
     def close_connection(self) -> None:
 
@@ -77,7 +74,7 @@ class Server:
         """
 
         try:
-            self.connection.close()
+            self.connection.close() # Try to close connection.
 
         except Exception as e:
             print(f"Exception during server closing: {e}!")
@@ -90,7 +87,7 @@ class Server:
         """
 
         try:
-            self.connection.settimeout(0.0001)
+            self.connection.settimeout(0.0001) # Does quick check
             msg = self.connection.recv(1024).decode()
 
             if msg == '<Terminating connection>':
@@ -101,11 +98,12 @@ class Server:
                 self.window['MESSAGES'].update(pre + '\n'
                                 + self.time_stamp.get_time() + ' User: ' + msg)
                 return "NONE"
+
         except socket.timeout:
             # Ugly way to ignore the timeouts
             pass
+
         except Exception as e:
-            #print(e)   # This prints time out
             self.logger.log.error(f"Exception during get_msg: {e}!")
             return "ERROR"
 
@@ -113,7 +111,7 @@ class Server:
 class Client:
 
     def __init__(self, win: PySimpleGUI.Window, logger: Logger,
-                                        ip: str, c_port: str = "1500") -> None:
+                                        ip: str, c_port: int = 1500) -> None:
         """
             Initializes a client connection object.
         """
@@ -128,15 +126,14 @@ class Client:
         assert isinstance(ip, str), (f"The given server ip {ip}"
                                         " is not of type str!")
 
-        assert isinstance(c_port, str), (f"The given client port {c_port}"
-                                         " is not of type str!")
+        assert isinstance(c_port, int), (f"The given client port {c_port}"
+                                         " is not of type int!")
 
         # Setting instance attributes
         self.host = socket.gethostname()
         self.client_port = c_port
 
         self.client = (ip, c_port)
-
 
         self.logger = logger # Used to log errors
         self.window = win
@@ -155,25 +152,22 @@ class Client:
 
             self.client_soc.settimeout(30)
 
-            #self.client_soc.connect((self.host, self.client_port))
             self.client_soc.connect(self.client)
+
             print("Client has been setup and connected")
-            done.set()
+
+            done.set() # Tells main thread that client has connected to server.
 
         except socket.timeout:
             print("Client timed out")
-            err.set()
+            err.set() # Tells main thread that error occured.
 
         except Exception as e:
             print(f"Exception during client connection: {e}!")
             self.logger.log.error(f"Exception during client connection: {e}!")
 
-            # # When 30 seconds has passed, stop trying to connect.
-            # if time.perf_counter() - start_time >= 30:
-            #     raise Exception("Connection attempt timed out")
-
-            # self.open_connection(start_time)
-
+            err.set() # Tells main thread that error occured.
+            
     def close_connection(self) -> None:
 
         """
@@ -182,7 +176,7 @@ class Client:
         """
 
         try:
-
+            self.client_soc.settimeout(1)
             self.client_soc.send('<Terminating connection>'.encode())
 
         except Exception as e:

@@ -15,4 +15,7 @@ class Logger:
 
     @property
     def log(self) -> logging.getLogger:
+        """
+            Access to logging object
+        """
         return self.__log

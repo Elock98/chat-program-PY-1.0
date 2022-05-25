@@ -3,3 +3,12 @@
 
 # VS code settings
 settings.json
+
+# Executables
+*.exe
+
+backup
+build
+dist
+.vscode
+__pycache__

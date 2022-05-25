@@ -1,9 +1,9 @@
 from threading import Thread, Event
 import PySimpleGUI as sg
-import time
 from logger import Logger
 from connection import Server, Client
 from timestamp import TimeStamp
+from contact import NewContactUI, ShowContactsUI, SelectContactUI
 
 
 class ChattWindow:
@@ -31,7 +31,8 @@ class ChattWindow:
         """
 
         menu_layout =   [
-                            ['Connection', ['Connect', 'Disconnect']]
+                            ["Connection", ["Connect", "Disconnect"]],
+                            ["Contacts", ["Add contact", "Show contacts"]]
                         ]
 
         layout =    [
@@ -50,27 +51,15 @@ class ChattWindow:
 
         """
             Creates a server and client object and runs their open_connection
-            methods.
+            methods in new threads.
         """
 
-        self.server = Server(self.window, self.logger, ip, port)
+        self.server = Server(self.window, self.logger, port)
         
         self.server_thread = Thread(target=self.server.open_connection, 
                                     args=(self.server_connected_done,
                                             self.server_connected_err))
         self.server_thread.start()
-        
-        # print("Pre temp short delay between server start and client start")
-        # time.sleep(0.5)
-        # print("Post temp short delay between server start and client start")
-
-        """
-            Note To Self:
-            Client will later run startup in a separate thread, both server
-            and client will take result flag as a variable; the flag will
-            be set to True if connected, False if it could not connect and
-            None if no result yet.
-        """
 
         self.client = Client(self.window, self.logger, ip, port)
         self.client_thread = Thread(target=self.client.open_connection, 
@@ -78,7 +67,6 @@ class ChattWindow:
                                             self.client_connected_err))
         self.client_thread.start()
 
-        #self.client.open_connection(time.perf_counter())
         
     def run(self) -> None:
 
@@ -113,24 +101,27 @@ class ChattWindow:
                 if connecting:
                     if (self.client_connected_err.is_set()
                         or self.server_connected_err.is_set()):
+                        # If error during connection
+                        try:
+                            self.client.close_connection()
+                            self.server.close_connection()
 
-                        self.client.close_connection()
-                        self.server.close_connection()
+                            connected = False
+                            connecting = False
 
-                        connected = False
-                        connecting = False
+                            self.client_connected_done.clear()
+                            self.client_connected_err.clear()
 
-                        self.client_connected_done.clear()
-                        self.client_connected_err.clear()
-
-                        self.server_connected_done.clear()
-                        self.server_connected_err.clear()
-                        
-                        self.window['MESSAGES'].update("Connection failed!")
+                            self.server_connected_done.clear()
+                            self.server_connected_err.clear()
+                            
+                            self.window['MESSAGES'].update("Connection failed!")
+                        except Exception as e:
+                            self.logger.log.error(f"ERR: {e}")
 
                     elif (self.client_connected_done.is_set()
                             and self.server_connected_done.is_set()):
-                            
+                            # If connection is established
                             connected = True
                             connecting = False
 
@@ -142,18 +133,29 @@ class ChattWindow:
                             
                             self.window['MESSAGES'].update("Connected!")
                     else:
-                        
                         continue
+
+                if event == "Add contact":
+                    NewContactUI().window_loop()
+
+                if event == "Show contacts":
+                    ShowContactsUI().run()
 
                 # When connected
                 if event == 'Connect' and not connected:
+                    
+                    try:
+                        ip, port = SelectContactUI().run()
+                    except TypeError:
+                        self.window['MESSAGES'].update("Connection failed!\n"
+                                                        "No contact selected!")
+                        continue
+
                     self.window['MESSAGES'].update("Connecting...")
 
                     connecting = True
-
-                    ip, port = values['MY_MESSAGE'].split(":") # Temp
-
-                    self.connect(int(ip), int(port))
+                    
+                    self.connect(ip, int(port))
 
                     self.window['MY_MESSAGE'].update("")
 
@@ -165,7 +167,7 @@ class ChattWindow:
                     self.client.close_connection()
                     self.server.close_connection()
 
-                if event == 'Send' and connected:
+                if event == 'Send' and connected and values['MESSAGES'] != "":
                     self.window['MESSAGES'].update(values['MESSAGES'] + '\n' 
                                                     + self.time_stamp.get_time()
                                                     + ' ME: ' 
