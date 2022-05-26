@@ -1,5 +1,5 @@
-from logger import Logger
-from UI import ChatWindow
+from src.logger import Logger
+from src.UI import ChatWindow
 
 
 def main():

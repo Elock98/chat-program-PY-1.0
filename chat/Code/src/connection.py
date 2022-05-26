@@ -1,8 +1,8 @@
 import socket
 from threading import Event
 import PySimpleGUI
-from timestamp import TimeStamp
-from logger import Logger
+from src.timestamp import TimeStamp
+from src.logger import Logger
 
 
 class Server:

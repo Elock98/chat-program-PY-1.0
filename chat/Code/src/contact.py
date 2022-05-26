@@ -95,7 +95,7 @@ class SelectContactUI:
         return sg.Window("Contacts", layout, size=(300, 400))
 
     def get_contacts(self) -> None:
-        with open("contacts.csv", "r") as csv_file:
+        with open(".\Code\src\contacts.csv", "r") as csv_file:
             reader = csv.reader(csv_file)
 
             for row in reader:
@@ -154,7 +154,7 @@ class ShowContactsUI:
         return sg.Window("Contacts", layout, size=(300, 400))
 
     def get_contacts(self) -> None:
-        with open("contacts.csv", "r") as csv_file:
+        with open(".\Code\src\contacts.csv", "r") as csv_file:
             reader = csv.reader(csv_file)
 
             for row in reader:
@@ -213,7 +213,7 @@ class NewContactUI:
         """
             Writes the new contact to file.
         """
-        with open("contacts.csv", "a") as csv_file:
+        with open(".\Code\src\contacts.csv", "a") as csv_file:
             writer = csv.writer(csv_file)
             row = [fld for fld in repr(contact).split(",")]
             writer.writerow(row)

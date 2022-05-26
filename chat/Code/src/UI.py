@@ -1,10 +1,10 @@
 from threading import Thread, Event
 import PySimpleGUI as sg
-from logger import Logger
-from connection import Server, Client
-from timestamp import TimeStamp
-from contact import NewContactUI, ShowContactsUI, SelectContactUI
-from setServerPort import ServerPortUI
+from src.logger import Logger
+from src.connection import Server, Client
+from src.timestamp import TimeStamp
+from src.contact import NewContactUI, ShowContactsUI, SelectContactUI
+from src.setServerPort import ServerPortUI
 
 class ChatWindow:
 
