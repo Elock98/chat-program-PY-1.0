@@ -1,8 +1,2 @@
-
-
-test1,123.123.123.123,111
-
-test2,321.321.321.321,222
-
-Emil Lock,192.168.10.104,1500
-Local Testing,localhost,1500
+Emil Lock,localhost,1500
+Tomas Lock,localhost,123

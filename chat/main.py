@@ -5,7 +5,7 @@ from UI import ChatWindow
 def main():
     try:
         logger = Logger() # Create log object
-        ChatWindow(logger).run() # Start program
+        ChatWindow(logger=logger).run() # Start program
         
         
     except Exception as e:

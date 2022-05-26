@@ -2,7 +2,9 @@ from asyncio.log import logger
 import logging
 
 class Logger:
-
+    """
+        Mainly used to log errors.
+    """
     def __init__(self) -> None:
         LOG_FORMAT = "%(levelname)s %(asctime)s %(message)s"
 

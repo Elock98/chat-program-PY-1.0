@@ -6,7 +6,8 @@ class TimeStamp:
         Used to get timestamp.
     """
 
-    def get_time(self) -> time.ctime:
+    @staticmethod
+    def get_time() -> time.ctime:
 
         """
             Used to get timestamp.

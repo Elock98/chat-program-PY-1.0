@@ -4,7 +4,7 @@ from logger import Logger
 from connection import Server, Client
 from timestamp import TimeStamp
 from contact import NewContactUI, ShowContactsUI, SelectContactUI
-
+from setServerPort import ServerPortUI
 
 class ChatWindow:
 
@@ -14,7 +14,7 @@ class ChatWindow:
             Initializes chat window object.
         """
 
-        # Validating given parameters
+        # Validating given parameter
         assert isinstance(logger, Logger), (f"The given logger {logger} is not"
                                             " of type Logger!")
 
@@ -25,15 +25,19 @@ class ChatWindow:
         self.time_stamp = TimeStamp()
         self.logger = logger
 
-    def make_window(self) -> sg.Window:
+        self.server_port = 1500
+
+    @staticmethod
+    def make_window() -> sg.Window:
 
         """
-            Creates and returns the window.
+            Creates and returns a main window object.
         """
 
         menu_layout =   [
                             ["Connection", ["Connect", "Disconnect"]],
-                            ["Contacts", ["Add contact", "Show contacts"]]
+                            ["Contacts", ["Add contact", "Show contacts"]],
+                            ["Settings", ["Set server port"]]
                         ]
 
         layout =    [
@@ -48,27 +52,31 @@ class ChatWindow:
 
         return sg.Window("Chat", layout, size=(800, 650), finalize=True)
 
-    def connect(self, ip: str, port: str) -> None:
+    def connect(self, name: str, ip: str, port: str) -> None:
 
         """
             Creates a server and client object and runs their open_connection
             methods in new threads.
         """
 
-        self.server = Server(self.window, self.logger, port)
+        # Server
+        self.server = Server(window=self.window, logger=self.logger, name=name, 
+                                s_port=self.server_port)
         
-        self.server_thread = Thread(target=self.server.open_connection, 
+        server_thread = Thread(target=self.server.open_connection, 
                                     args=(self.server_connected_done,
                                             self.server_connected_err))
-        self.server_thread.start()
+        server_thread.start()
 
-        self.client = Client(self.window, self.logger, ip, port)
-        self.client_thread = Thread(target=self.client.open_connection, 
+        # Client
+        self.client = Client(window=self.window, logger=self.logger, 
+                                ip=ip, c_port=port)
+
+        client_thread = Thread(target=self.client.open_connection, 
                                     args=(self.client_connected_done,
                                             self.client_connected_err))
-        self.client_thread.start()
-
-        
+        client_thread.start()
+   
     def run(self) -> None:
 
         """
@@ -137,16 +145,22 @@ class ChatWindow:
                         continue
 
                 if event == "Add contact":
-                    NewContactUI().window_loop()
+                    NewContactUI().run()
 
                 if event == "Show contacts":
                     ShowContactsUI().run()
+
+                if event == "Set server port":
+                    rv = ServerPortUI().run()
+                    print("EY")
+                    if isinstance(rv, int):
+                        self.server_port = rv
 
                 # When connected
                 if event == 'Connect' and not connected:
                     
                     try:
-                        ip, port = SelectContactUI().run()
+                        name, ip, port = SelectContactUI().run()
                     except TypeError:
                         self.window['MESSAGES'].update("Connection failed!\n"
                                                         "No contact selected!")
@@ -156,7 +170,7 @@ class ChatWindow:
 
                     connecting = True
                     
-                    self.connect(ip, int(port))
+                    self.connect(name=name, ip=ip, port=int(port))
 
                     self.window['MY_MESSAGE'].update("")
 
@@ -168,6 +182,9 @@ class ChatWindow:
                     self.client.close_connection()
                     self.server.close_connection()
 
+                    del self.client
+                    del self.server
+
                 if ((event == 'Send' or event == "MY_MESSAGE_Enter") 
                     and connected and values['MESSAGES'] != ""):
 
@@ -176,12 +193,12 @@ class ChatWindow:
                                                     + ' ME: ' 
                                                     + values['MY_MESSAGE'])
 
-                    self.client.send(values['MY_MESSAGE'])
+                    self.client.send(msg=values['MY_MESSAGE'])
 
                     self.window['MY_MESSAGE'].update("")
 
                 if connected:
-                    resp = self.server.get_msg(values['MESSAGES'])
+                    resp = self.server.get_msg(previous_text=values['MESSAGES'])
                     if resp == "Close":
                         
                         self.window['MESSAGES'].update("Disconnected")
@@ -191,6 +208,9 @@ class ChatWindow:
                         self.client.close_connection()
                         self.server.close_connection()
 
+                        del self.client
+                        del self.server
+
                         print("Connection ended by other user")
 
             # except AttributeError as e:
@@ -198,5 +218,3 @@ class ChatWindow:
             except Exception as e:
                 self.logger.log.error(f"Exception in chatwindow run: {e}!")
 
-            # Handle connection timeout exception 
-            # (+ create a connection timeout exception)

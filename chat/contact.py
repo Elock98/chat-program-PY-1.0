@@ -1,6 +1,6 @@
 import PySimpleGUI as sg
 import csv
-
+from typing import Optional
 
 class Contact:
     
@@ -60,9 +60,9 @@ class Contact:
     @property
     def contact_connection(self) -> tuple:
         """
-            This is used to get address and port to connect to.
+            This is used to get name address and port to connect to.
         """
-        return (self.__address, self.__port)
+        return (self.__name, self.__address, self.__port)
 
     def __repr__(self) -> str:
         """
@@ -84,7 +84,8 @@ class SelectContactUI:
         self.contacts = []
         self.window = self.make_window()
 
-    def make_window(self) -> sg.Window:
+    @staticmethod
+    def make_window() -> sg.Window:
         layout =    [
                         [sg.Listbox(values=[], key="CONTACT_DISPLAY", 
                          expand_x=True, expand_y=True)],
@@ -101,10 +102,10 @@ class SelectContactUI:
                 if row != []:
                     self.contacts.append(Contact(row[0], row[1], int(row[2])))
 
-    def run(self) -> tuple:
+    def run(self) -> Optional[tuple]:
         """
             This method should be called by UI. It will return a typle
-            (IP, PORT_NUMBER) if contact is selected, otherwise NoneType
+            (NAME, IP, PORT_NUMBER) if contact is selected, otherwise NoneType
             is returned.
         """
         self.get_contacts()
@@ -143,7 +144,8 @@ class ShowContactsUI:
         self.contacts = []
         self.window = self.make_window()
 
-    def make_window(self) -> sg.Window:
+    @staticmethod
+    def make_window() -> sg.Window:
         layout =    [
                         [sg.Listbox(values=[], key="CONTACT_DISPLAY", 
                          expand_x=True, expand_y=True)]
@@ -188,7 +190,8 @@ class NewContactUI:
     def __init__(self) -> None: # Pass in theme later?
         self.window = self.make_window()
 
-    def make_window(self) -> sg.Window:
+    @staticmethod
+    def make_window() -> sg.Window:
         
         layout =    [
                         [sg.Text("Name:", size=(7,1)),
@@ -205,7 +208,8 @@ class NewContactUI:
 
         return sg.Window("New Contact", layout, size=(300, 125))  
 
-    def save_contact(self, contact: Contact) -> None:
+    @staticmethod
+    def save_contact(contact: Contact) -> None:
         """
             Writes the new contact to file.
         """
@@ -214,7 +218,7 @@ class NewContactUI:
             row = [fld for fld in repr(contact).split(",")]
             writer.writerow(row)
 
-    def window_loop(self) -> None:
+    def run(self) -> None:
         """
             Runs the new contact window.
         """

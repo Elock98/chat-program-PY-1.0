@@ -3,34 +3,39 @@ from threading import Event
 import PySimpleGUI
 from timestamp import TimeStamp
 from logger import Logger
-import time
 
 
 class Server:
 
-    def __init__(self, win: PySimpleGUI.Window, logger: Logger,
+    def __init__(self, window: PySimpleGUI.Window, logger: Logger, name: str,
                                         s_port: int = 1500) -> None:
 
         """
             Initializes a server connection object.
         """
         # Parameter validation
-        assert isinstance(win, PySimpleGUI.Window), (f"The given window {win}"
-                                    " is not of type PySimpleWindow.Window!")
+        assert isinstance(window, PySimpleGUI.Window), (f"The given window"
+                                    f" {window} is not of type"
+                                     " PySimpleWindow.Window!")
 
         assert isinstance(logger, Logger), (f"The given logger {logger}"
                                             " is not of type Logger!")
+
+        assert isinstance(name, str), (f"The given name {name} is not"
+                                        " of type str!")
 
         assert isinstance(s_port, int), (f"The given server port {s_port}"
                                         " is not of type int!")
 
         # Setting instance arrtibutes
+        self.connected_user_name = name
+
         self.host = socket.gethostbyname(socket.gethostname()) # Get device IP.
         self.server_port = s_port
 
         self.server = (self.host, s_port)
 
-        self.window = win
+        self.window = window
         self.time_stamp = TimeStamp() # Used to output message recieved time
         self.logger = logger    # Used to log errors
 
@@ -80,7 +85,7 @@ class Server:
             print(f"Exception during server closing: {e}!")
             self.logger.log.error(f"Exception during server closing: {e}!")
 
-    def get_msg(self, pre: str) -> str:
+    def get_msg(self, previous_text: str) -> str:
 
         """
             Updates the 'MESSAGES' multiline box with incoming messages.
@@ -95,8 +100,9 @@ class Server:
                 print(msg)
                 return "Close"
             else:
-                self.window['MESSAGES'].update(pre + '\n'
-                                + self.time_stamp.get_time() + ' User: ' + msg)
+                self.window['MESSAGES'].update(previous_text + '\n'
+                                + self.time_stamp.get_time() 
+                                + " " + self.connected_user_name + ": " + msg)
                 return "NONE"
 
         except socket.timeout:
@@ -110,15 +116,16 @@ class Server:
 
 class Client:
 
-    def __init__(self, win: PySimpleGUI.Window, logger: Logger,
+    def __init__(self, window: PySimpleGUI.Window, logger: Logger,
                                         ip: str, c_port: int = 1500) -> None:
         """
             Initializes a client connection object.
         """
 
         # Parameter validation
-        assert isinstance(win, PySimpleGUI.Window), (f"The given window {win}"
-                                     " is not of type PySimpleWindow.Window!")
+        assert isinstance(window, PySimpleGUI.Window), (f"The given window"
+                                     f" {window} is not of type"
+                                     " PySimpleWindow.Window!")
 
         assert isinstance(logger, Logger), (f"The given logger {logger}"
                                             " is not of type Logger!")
@@ -130,13 +137,17 @@ class Client:
                                          " is not of type int!")
 
         # Setting instance attributes
+
         self.host = socket.gethostname()
         self.client_port = c_port
 
-        self.client = (ip, c_port)
+        if ip == "localhost":
+            self.client = (self.host, c_port)
+        else:
+            self.client = (ip, c_port)
 
         self.logger = logger # Used to log errors
-        self.window = win
+        self.window = window
 
     def open_connection(self, done: Event, err: Event) -> None:
 
